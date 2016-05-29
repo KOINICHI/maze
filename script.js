@@ -44,8 +44,8 @@ var Maze = function(width, height) {
 	
 	this.width = width;
 	this.height = height;
-	this.blockWidth = window.innerWidth/this.width;
-	this.blockHeight = window.innerHeight/this.height;
+	this.blockWidth = Math.floor((window.innerWidth - 12)/this.width);
+	this.blockHeight = Math.floor((window.innerHeight - 12)/this.height); // 12 for maze border
 
 	this.maze = [];
 	
@@ -64,7 +64,11 @@ var Maze = function(width, height) {
 		this.connectBlocks(this.getBlock(x,height), this.getBlock(x,height+1));
 	}
 	
-	this.html = $('.maze');
+	this.html = $('.maze')
+		.css('width', this.blockWidth * this.width)
+		.css('height', this.blockHeight * this.height)
+		.css('left', (window.innerWidth - (this.blockWidth * this.width))/2)
+		.css('top', (window.innerHeight - (this.blockHeight * this.height))/2);
 	this.dfs(this.getBlock(1,1));
 	this.render();
 }
@@ -100,10 +104,6 @@ Maze.prototype.dfs = function(block) {
 	if (block.visited) { return -1; }
 	block.visited = true;
 	var x = block.x, y = block.y;
-
-	if (x == 2 && y == 2) {
-		console.log('hihi');
-	}
 	
 	var dirs = [];
 	if (block.right == null) { dirs.push(this.RIGHT); }
@@ -146,8 +146,8 @@ Maze.prototype.render = function() {
 		}
 	}
 	
-	this.getBlock(1, this.height).html.text('Start');
-	this.getBlock(this.width, 1).html.text('E');
+	this.getBlock(1, this.height).html.html('<span>\u2B24</span>');
+	this.getBlock(this.width, 1).html.html('<span>\u2605</span>');
 }
 
 
