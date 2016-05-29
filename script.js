@@ -151,6 +151,6 @@ Maze.prototype.render = function() {
 }
 
 
-window.maze = new Maze(32, 18);
+window.maze = new Maze(Math.floor(window.innerWidth / 42) , Math.floor(window.innerHeight / 42));
 
 }(jQuery);
