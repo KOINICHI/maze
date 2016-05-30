@@ -2,6 +2,11 @@ body {
     margin: 0px;
 }
 
+#maze-wrapper {
+    font-size: 0pt;
+    margin: 0px;
+    padding: 0px;
+}
 .maze {
 	background-color: rgb(248, 145, 13);
     position: absolute;
@@ -15,7 +20,12 @@ body {
     text-align: center;
 }
 
-.maze  .block > span {
-    font-size: 1.7em;
+.maze  .block > .item {
+    display: inline-block;
     color: #fff;
+    transition: 0.5s;
+}
+.maze  .block > .item:hover {
+    text-shadow: 0px 0px 10px #fff;
+    cursor: default;
 }

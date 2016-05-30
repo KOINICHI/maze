@@ -35,8 +35,44 @@ var Block = function(x,y, maze) {
 		.css('left', maze.blockWidth * (x-1));
 }
 
+var Item = function(block, character, type) {
+	this.block = block;
+	this.character = character;
+	this.type = type;
+	
+	var font_size = Math.floor(Math.min(block.maze.blockWidth, block.maze.blockHeight) / 1.5);
+	this.html = $('<div>')
+		.addClass('item')
+		.addClass(type)
+		.text(character)
+		.css('font-size', font_size)
+		.css('line-height', block.maze.blockHeight + 'px');
+}
+
+Item.prototype.placeAt = function(block) {
+	if (block == null) { return; }
+	if (block.isborder) { return; }
+	this.block.html.find(this.type).remove();
+	this.block = block;
+	this.block.html.html(this.html);
+}
+
+function Player(block, character) {
+	Item.call(this, block, character, 'player');
+	var that = this;
+}
+Player.prototype = Object.create(Item.prototype);
+Player.constructor = Player;
+
+function Goal(block, character) {
+	Item.call(this, block, character, 'goal');
+}
+Goal.prototype = Object.create(Item.prototype);
+Goal.constructor = Goal;
 
 var Maze = function(width, height) {
+	var that = this;
+	
 	this.TOP = 1;
 	this.RIGHT = 2;
 	this.BOTTOM = 4;
@@ -44,9 +80,9 @@ var Maze = function(width, height) {
 	
 	this.width = width;
 	this.height = height;
-	this.blockWidth = Math.floor((window.innerWidth - 12)/this.width);
-	this.blockHeight = Math.floor((window.innerHeight - 12)/this.height); // 12 for maze border
-
+	this.blockWidth = Math.floor((window.innerWidth)/this.width);
+	this.blockHeight = Math.floor((window.innerHeight)/this.height); // 4 for maze border
+	
 	this.maze = [];
 	
 	for (var y=0; y<this.height+2; y++) {
@@ -64,12 +100,19 @@ var Maze = function(width, height) {
 		this.connectBlocks(this.getBlock(x,height), this.getBlock(x,height+1));
 	}
 	
-	this.html = $('.maze')
+	this.html = $('<div>')
+		.addClass('maze')
 		.css('width', this.blockWidth * this.width)
 		.css('height', this.blockHeight * this.height)
-		.css('left', (window.innerWidth - (this.blockWidth * this.width))/2)
-		.css('top', (window.innerHeight - (this.blockHeight * this.height))/2);
+		.css('left', Math.floor((window.innerWidth - (this.blockWidth * this.width))/2))
+		.css('top', Math.floor((window.innerHeight - (this.blockHeight * this.height))/2));
+		
 	this.dfs(this.getBlock(1,1));
+	
+	this.player = new Player(this.getBlock(1, this.height), '\u2B24');
+	this.goal = new Goal(this.getBlock(this.width, 1), '\u2605');
+	this.items = [];
+	
 	this.render();
 }
 
@@ -145,12 +188,33 @@ Maze.prototype.render = function() {
 			this.html.append(block.html);
 		}
 	}
-	
-	this.getBlock(1, this.height).html.html('<span>\u2B24</span>');
-	this.getBlock(this.width, 1).html.html('<span>\u2605</span>');
+	this.player.placeAt(this.getBlock(1, this.height));
+	this.goal.placeAt(this.getBlock(this.width, 1));
+	$('#maze-wrapper').html(this.html);
 }
 
 
-window.maze = new Maze(Math.floor(window.innerWidth / 42) , Math.floor(window.innerHeight / 42));
+
+var blockSize = 80;
+window.maze = new Maze(Math.floor(window.innerWidth / blockSize) , Math.floor(window.innerHeight / blockSize));
+
+$(window).on('keydown', function(e) {
+	var LEFT = 37, TOP = 38, RIGHT = 39, BOTTOM = 40;
+	var player = this.maze.player;
+	var goal = this.maze.goal;
+	switch (e.which)
+	{
+		case LEFT   : player.placeAt(player.block.left);   break;
+		case TOP    : player.placeAt(player.block.top);    break;
+		case RIGHT  : player.placeAt(player.block.right);  break;
+		case BOTTOM : player.placeAt(player.block.bottom); break;
+	}
+	if (player.block == goal.block) {
+		blockSize = Math.max(20, blockSize-10);
+		var x = Math.floor(window.innerWidth / blockSize);
+		var y = Math.floor(window.innerHeight / blockSize);
+		this.maze = new Maze(x, y);
+	}
+});
 
 }(jQuery);
