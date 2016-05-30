@@ -194,12 +194,12 @@ Maze.prototype.render = function() {
 }
 
 
-
 var blockSize = 80;
 window.maze = new Maze(Math.floor(window.innerWidth / blockSize) , Math.floor(window.innerHeight / blockSize));
 
 $(window).on('keydown', function(e) {
 	var LEFT = 37, TOP = 38, RIGHT = 39, BOTTOM = 40;
+	var PG_UP = 33, PG_DOWN = 34;
 	var player = this.maze.player;
 	var goal = this.maze.goal;
 	switch (e.which)
@@ -208,6 +208,12 @@ $(window).on('keydown', function(e) {
 		case TOP    : player.placeAt(player.block.top);    break;
 		case RIGHT  : player.placeAt(player.block.right);  break;
 		case BOTTOM : player.placeAt(player.block.bottom); break;
+		case PG_UP  : 
+			blockSize = Math.min(80, blockSize+10);
+			this.maze = new Maze(Math.floor(window.innerWidth / blockSize) , Math.floor(window.innerHeight / blockSize)); break;
+		case PG_DOWN: 
+			blockSize = Math.max(20, blockSize-10);
+			this.maze = new Maze(Math.floor(window.innerWidth / blockSize) , Math.floor(window.innerHeight / blockSize)); break;
 	}
 	if (player.block == goal.block) {
 		blockSize = Math.max(20, blockSize-10);
