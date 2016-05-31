@@ -1,3 +1,3 @@
 Random Maze
 
-koinichi.github.io/maze
+http://koinichi.github.io/maze
